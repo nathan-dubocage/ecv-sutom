@@ -8,7 +8,7 @@ use App\Game\Lobby;
 
 class Game implements Controller
 {
-    public function render()
+    public function render(): void
     {
         new Lobby();
     }

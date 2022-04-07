@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Routing;
 
 use App\Controller\Controller;
-use App\Controller\Game;
 use App\Controller\Error404;
+use App\Controller\Game;
 
 class Router
 {
     private array $routes = [
         '/' => Game::class,
-        '/404' => Error404::class
+        '/404' => Error404::class,
     ];
 
     private string $path;
@@ -28,7 +28,7 @@ class Router
         $controller = new $controllerClass();
 
         if (!$controller instanceof Controller) {
-            throw new \LogicException("controller $controllerClass should implement " . Controller::class);
+            throw new \LogicException("controller $controllerClass should implement ".Controller::class);
         }
 
         $controller->render();
