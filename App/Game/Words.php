@@ -6,7 +6,7 @@ namespace App\Game;
 
 class Words
 {
-    private const FILE_PATH = __DIR__ . '/../../var/words.txt';
+    private const FILE_PATH = __DIR__.'/../../var/words.txt';
     private array $words = [];
 
     public function __construct()

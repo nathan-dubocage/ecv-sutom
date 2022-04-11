@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Game;
 
 class Lobby
@@ -14,7 +16,7 @@ class Lobby
     private function checkGame(): void
     {
         if (isset($_COOKIE['word']) && isset($_COOKIE['try']) && $_COOKIE['try'] < 7) {
-            require_once(__DIR__ . '/../../App/View/form.php');
+            require_once __DIR__.'/../../App/View/form.php';
 
             if (isset($_POST['word'])) {
                 $word = htmlspecialchars($_POST['word']);
@@ -29,21 +31,28 @@ class Lobby
     private function checkWord(string $word): void
     {
         $cookieWord = $_COOKIE['word'];
-        $currentTry = $_COOKIE['try'];
-        $currentTry++;
-        setcookie('try', $currentTry);
+        $currentTry = (int)$_COOKIE['try'];
+        ++$currentTry;
+        // le code n'était pas bon :
+        // setcookie(string $name, string $value = "", array $options = []): bool
+        // on devrait envoyer une string et pas un entier.
+        // comme tu n'a pas utilisé de strict_types tu ne t'es pas rendu compte que tu n'étais pas précis.
+        setcookie('try', (string)$currentTry);
         $this->showResult($cookieWord, $word, $currentTry);
     }
 
+    // cette méthode n'a pas trop sa place ici, c'est plutôt des choses à retrouver dans un template.
     private function showResult(string $cookieWord, string $word, int $currentTry): void
     {
-        if ($currentTry === 6) {
-            echo "C'est perdu ! Le mot était " . $cookieWord . ". Vous avez utilisé " . $currentTry . " essais.";
+        if (6 === $currentTry) {
+            echo "C'est perdu ! Le mot était ".$cookieWord.'. Vous avez utilisé '.$currentTry.' essais.';
+
             return;
         }
 
-        if ($cookieWord == strtoupper($word)) {
-            echo "C'est gagné ! Le mot était " . $cookieWord . ". Vous avez utilisé " . $currentTry . " essais.";
+        if ($cookieWord === strtoupper($word)) {
+            echo "C'est gagné ! Le mot était ".$cookieWord.'. Vous avez utilisé '.$currentTry.' essais.';
+
             return;
         }
 
@@ -51,21 +60,19 @@ class Lobby
         $explodeWord = str_split($upperWord);
         $explodeCookieWord = str_split($cookieWord);
 
-        echo "Vous avez saisi le mot : " . $upperWord . " <br />";
-        echo "Liste des lettres contenues dans le mot à deviner : ";
+        echo 'Vous avez saisi le mot : '.$upperWord.' <br />';
+        echo 'Liste des lettres contenues dans le mot à deviner : ';
         $letters = [];
 
-        foreach ($explodeWord as $key => $value) {
-            if (in_array($value, $explodeCookieWord)) {
-                if (!in_array($value, $letters)) {
-                    array_push($letters, $value);
+        foreach ($explodeWord as $value) {
+            if (\in_array($value, $explodeCookieWord, true)) {
+                if (!\in_array($value, $letters, true)) {
+                    $letters[] = $value;
                 }
             }
         }
 
-        foreach ($letters as $letter) {
-            echo $letter . " | ";
-        }
+        echo implode(' | ', $letters);
     }
 
     private function initializeLobby(): void
@@ -80,7 +87,11 @@ class Lobby
 
         /* --- On place le mot dans un cookie --- */
         setcookie('word', $selectedWord);
-        setcookie('try', 0);
+        // ce code n'est pas bon :
+        // setcookie(string $name, string $value = "", array $options = []): bool
+        // on devrait envoyer une string et pas un entier.
+        // comme tu n'a pas utilisé de strict_types tu ne t'es pas rendu compte que tu n'étais pas précis.
+        setcookie('try', '0');
         $this->word = $selectedWord;
     }
 
